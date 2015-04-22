@@ -1,0 +1,7 @@
+{
+  "location": "front",
+  "openScript": "echo \"open sesame!\"",
+  "pollScript": "bin/rfidpoll",
+  "serverIP": "10.0.31.31",
+  "serverPort": "8080
+}

@@ -13,12 +13,27 @@ app.get('/', function (req, res) {
 
 app.get('/:group/check', function (req, res) {
   console.log(req.body)
+
+  var group = req.params.group
+
   var rfid = req.body.rfid;
   if (!users.hasOwnProperty(rfid)) {
     console.log("unrecognized tag: ",rfid)
-    return res.end("{'authorized': false}")
+    return res.end(JSON.stringify({
+      authorized: false
+    }));
   }
- 
+  if (users[rfid].access[group]) {
+    console.log(users[rfid].name, " accessed ", group, "at ", Date.now())
+    return res.end(JSON.stringify({
+      authorized: true
+    }));
+  }
+  console.log("unauthorized attempt by", users[rfid].name, " to ", group,
+	      " at ", Date.now())
+  return res.end(JSON.stringify({
+    authorized: false
+  }));
 });
 
 var server = app.listen(8080, function() {

@@ -1,25 +1,47 @@
 var http = require('http');
+var exec = require('child_process').exec;
 
-var body = JSON.stringify({
-  rfid: "DEADBEEF"
-})
+var config = require('./client_config')
 
-var request = new http.ClientRequest({
-  hostname: '10.0.31.31',
-  port: '8080',
-  path: '/door/check',
-  method: "GET",
-  headers: {
-    "Content-Type": 'application/json',
-    "Content-Length": Buffer.byteLength(body)
-  }
-  
-})
+//listen to a binary script for id's, then send them to the server
+//the server will respond authorized or not
+//if authorized, call the binary script to let them in
 
-request.end(body)
+var mylocation = config.location
 
-request.on('response', function (response) {
-  response.on('data', function (chunk) {
-    console.log('BODY: ' + chunk);
-  });
+//query the server to see if the ID is valid
+function checkPermission(tagID) {
+  var body = JSON.stringify({
+    rfid: tagID
+  })
+
+  var request = new http.ClientRequest({
+    hostname: config.serverIP,
+    port: config.serverPort,
+    path: '/'+mylocation+'/check',
+    method: "GET",
+    headers: {
+      "Content-Type": 'application/json',
+      "Content-Length": Buffer.byteLength(body)
+    }
+  })
+  //send request
+  request.end(body)
+
+  //wait for response
+  request.on('response', function (response) {
+    response.on('data', function (chunk) {
+      chunk = JSON.parse(chunk)
+      console.log(chunk);
+      if (chunk.authorized) {
+	console.log('beep boop')
+      }
+    });
+  })
+
+}
+
+//listen to reader
+exec('ls', function (error, stdout, stderr) {
+  checkPermission(stdout+"")
 })
