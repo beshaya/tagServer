@@ -7,7 +7,7 @@ tagClient is designed to run on a Raspberry Pi with libnfc and a adafruit PN532 
 
 ## Authenticated Users
 
-Put a list of authenticated users in JSON format in users.json:
+Put a list of authenticated users in JSON format in users.js:
 ```
 users = { 
   'USERNAME': 'RFID TAG',
