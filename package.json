@@ -1,0 +1,24 @@
+{
+  "author": "Benjamin Shaya <bshaya@restdevices.com> (http://mimobaby.com)",
+  "name": "tagServer",
+  "version": "0.0.1",
+  "description": "A client-server pair for authenticating rfid tags",
+  "main": "./tagServer.js",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:beshaya/tagServer.git"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "express": "4.12.*",
+    "body-parser": "*",
+    "http": "*"
+  },
+  "keywords": ["rfid"],
+  "devDependencies": {
+    "should": "1.2.x",
+    "mocha": "1.8.x"
+  },
+  "scripts": {
+  }
+}
