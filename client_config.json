@@ -1,7 +1,9 @@
 {
   "location": "front",
-  "openScript": "echo \"open sesame!\"",
-  "pollScript": "bin/rfidpoll",
+  "authScript": "./bin/allow 10000",
+  "noauthScript": "echo \"go away\"",
+  "pollScript": "./bin/uidpoll",
+  "pollOptions": ["-q"],
   "serverIP": "10.0.31.31",
-  "serverPort": "8080
+  "serverPort": "8080"
 }

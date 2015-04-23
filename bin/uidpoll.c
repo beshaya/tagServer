@@ -78,6 +78,7 @@ int my_nfc_poll(nfc_device *pnd, nfc_context *context, int quiet) {
       print_hex(nt.nti.nai.abtAts, nt.nti.nai.szAtsLen);
     }
     printf("\n");
+    fflush(stdout);
   }
 
   // wait for the tag to be removed
@@ -104,8 +105,11 @@ int main (int argc, const char *argv[]) {
     exit(-1);
   }
 
-  if ( my_nfc_poll(pnd, context, quiet) != 0) {
-    exit(-1);
+  fflush(stdout);
+  while (1) {
+    if ( my_nfc_poll(pnd, context, quiet) != 0) {
+      exit(-1);
+    }
   }
 
   // Close NFC device

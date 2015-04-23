@@ -1,4 +1,5 @@
 var http = require('http');
+var spawn = require('child_process').spawn;
 var exec = require('child_process').exec;
 
 var config = require('./client_config')
@@ -34,7 +35,13 @@ function checkPermission(tagID) {
       chunk = JSON.parse(chunk)
       console.log(chunk);
       if (chunk.authorized) {
-	console.log('beep boop')
+	  exec(config.authScript, function (error, stdout, stderr) {
+	      console.log(stdout);
+	  });
+      } else {
+	  exec(config.noauthScript, function (error, stdout, stderr) {
+	      console.log(stdout);
+	  });
       }
     });
   })
@@ -42,6 +49,22 @@ function checkPermission(tagID) {
 }
 
 //listen to reader
-exec('ls', function (error, stdout, stderr) {
-  checkPermission(stdout+"")
-})
+reader_data = ""
+console.log("listening with ", config.pollScript)
+var child = spawn(config.pollScript, config.pollOptions)
+child.stdout.on('data', function (chunk) {
+    data = chunk.toString('utf-8');
+    console.log("read: "+data);
+    reader_data += data
+    if (reader_data.indexOf("\n") >= 0) {
+	var entry = reader_data.split("\n")[0];
+	reader_data = reader_data.split("\n")[1];
+	checkPermission(entry)
+    }
+});
+child.stderr.on('data', function (data) {
+    console.log('stderr: ' + data)
+});
+child.on('close', function (code) {
+    console.log('child exited');
+});
