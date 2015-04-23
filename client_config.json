@@ -1,9 +1,9 @@
 {
   "location": "front",
-  "authScript": "./bin/allow 10000",
+  "authScript": "./bin/allow 4000",
   "noauthScript": "echo \"go away\"",
   "pollScript": "./bin/uidpoll",
   "pollOptions": ["-q"],
-  "serverIP": "10.0.31.31",
+  "serverIP": "morganfox",
   "serverPort": "8080"
 }
