@@ -24,3 +24,9 @@ users = {
 RFID Tag is formatted %0x (i.e. deadbeef instead of DEADBEEF)
 
 users.json is in .gitignore for obvious reasons :)
+
+## Generating Keys
+
+If you have a properly signed SSL certificate for your server, great, otherwise, you'll probably want to put together a self signed certificate chain.
+
+I suggest following the directions [here](https://github.com/coolaj86/node-ssl-root-cas/wiki/Painless-Self-Signed-Certificates-in-node.js). Note that you may need to set up /etc/hosts on your client device(s) and give your server a host name, since ssl seems to have beef with IP addresses.  Store your root ca (private-root-ca.crt.pem), server key (server.key.pem) and server certificate (server.csr.pem) in the ./keys folder on your server. The client only needs the root ca (same folder).
