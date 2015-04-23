@@ -1,9 +1,25 @@
 var express = require('express');
 var bodyParser = require('body-parser')
+var https = require('https');
+var fs = require('fs');
 
 var users = require('./users.json');
 
+var config = require('./client_config.json');
+
+require('ssl-root-cas')
+  .inject()
+  .addFile('./keys/private-root-ca.crt.pem');
+
+var httpsOptions = {
+  key: fs.readFileSync('./keys/server.key.pem'),
+  cert: fs.readFileSync('./keys/server.crt.pem')
+}
+
 var app = express();
+
+https.createServer(httpsOptions, app).listen(config.serverPort);
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true}));
 
@@ -36,9 +52,11 @@ app.get('/:group/check', function (req, res) {
   }));
 });
 
+/*
 var server = app.listen(8080, function() {
   var host = server.address().address;
   var port = server.address().port;
 
   console.log('RFID Server listening at http://%s:%s', host, port);
 })
+*/

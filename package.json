@@ -12,7 +12,8 @@
   "dependencies": {
     "express": "4.12.*",
     "body-parser": "*",
-    "http": "*"
+    "https": "*",
+    "ssl-root-cas": "1.1.*"
   },
   "keywords": ["rfid"],
   "devDependencies": {

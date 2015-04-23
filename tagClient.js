@@ -1,6 +1,7 @@
-var http = require('http');
+var https = require('https');
 var spawn = require('child_process').spawn;
 var exec = require('child_process').exec;
+var fs = require('fs')
 
 var config = require('./client_config')
 
@@ -10,22 +11,29 @@ var config = require('./client_config')
 
 var mylocation = config.location
 
+var options = {
+  hostname: config.serverIP,
+  port: config.serverPort,
+  path: '/'+mylocation+'/check',
+  method: 'GET',
+  ca: fs.readFileSync('./keys/private-root-ca.crt.pem')
+};
+
+options.agent = new https.Agent(options);
+
 //query the server to see if the ID is valid
 function checkPermission(tagID) {
   var body = JSON.stringify({
     rfid: tagID
   })
 
-  var request = new http.ClientRequest({
-    hostname: config.serverIP,
-    port: config.serverPort,
-    path: '/'+mylocation+'/check',
-    method: "GET",
-    headers: {
-      "Content-Type": 'application/json',
-      "Content-Length": Buffer.byteLength(body)
-    }
-  })
+  options.headers = {
+    "Content-Type": 'application/json',
+    "Content-Length": Buffer.byteLength(body)
+  }
+  
+  var request = https.request(options);
+
   //send request
   request.end(body)
 
