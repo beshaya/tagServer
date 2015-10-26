@@ -1,10 +1,10 @@
-//Toggles LED 18
+//Toggles LED 23
 
 #include "blink.h"
 
 int main(int argc, char *argv[]) {
 
-  blinkLED(18, 2);
+  blinkLED(23, 2);
   
 }
 
