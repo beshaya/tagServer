@@ -29,33 +29,6 @@ var Users = module.exports = function Users(filename) {
   debug('Found %s users', Object.keys(this.users).length);
 };
 
-
-// Logger.prototype.log = function(object, message) {
-//   // Perform the argument shuffle
-//   if (typeof object === 'string') {
-//     message = object;
-//     object = {};
-//   }
-
-//   try {
-//     var data = {
-//       message: message,
-//       data: object,
-//       timestamp: Date.now()
-//     };
-//     message = JSON.stringify(data);
-
-//     // Log to file first
-//     this.file.write(message + '\n');
-//     console.log(message);
-
-//     this.lines.push(data);
-
-//   } catch (e) {
-//     debug('Error recording log: %s', e);
-//   }
-// };
-
 Users.prototype.add = function(user) {
   debug('Adding user');
   if (!user.name) return;
