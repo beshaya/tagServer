@@ -1,80 +1,121 @@
 var exec = require('child_process').exec;
 var express = require('express');
-var bodyParser = require('body-parser')
+var bodyParser = require('body-parser');
 var fs = require('fs');
 var https = require('https');
 var http = require('http');
+var exphbs  = require('express-handlebars');
 
-var users = require('./users.json');
 var config = require('./client_config.json');
 
-//Needed for self-signed root CA's
+// Setup data!
+var logger = new (require('./logger'))('./logs.json');
+var Users = new (require('./users'))('./users.json');
+var ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+
+// Needed for self-signed root CA's
 if (config.useHTTPS) {
-    require('ssl-root-cas')
-	.inject()
-	.addFile('./keys/private-root-ca.crt.pem');
+  require('ssl-root-cas')
+    .inject()
+    .addFile('./keys/private-root-ca.crt.pem');
 }
 
-//Configure https
+// Configure https
 var httpsOptions;
 
 if (config.useHTTPS) {
-    httpsOptions = {
-	key: fs.readFileSync('./keys/server.key.pem'),
-	cert: fs.readFileSync('./keys/server.crt.pem')
-    }
+  httpsOptions = {
+    key: fs.readFileSync('./keys/server.key.pem'),
+    cert: fs.readFileSync('./keys/server.crt.pem')
+  };
 }
+
+/**
+ * App Setup & Middleware
+ * =============================================================================
+ */
 
 var app = express();
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true}));
+app.use(bodyParser.urlencoded({extended: true}));
+app.engine('handlebars', exphbs({defaultLayout: 'main'}));
+app.set('view engine', 'handlebars');
 
-//Main page just to check things are working
-app.get('/', function (req, res) {
-  res.end("rfid server running")
-})
 
-//access here!
-app.get('/:location/check', function (req, res) {
-    //console.log(req.body)
+/**
+ * Main Routes!
+ * =============================================================================
+ */
 
-    //Re-read groups file (maybe upgrade this to redis someday)
-    groups = JSON.parse(fs.readFileSync('./groups.json'));
-    var location = req.params.location
-    var group = groups[location]
-    
-    var rfid = req.body.rfid;
-    if (!users.hasOwnProperty(rfid)) {
-	console.log("unrecognized tag: %s attempted to access %s at %s",
-		    rfid, location, Date.now());
-	return res.end(JSON.stringify({
-	    authorized: false
-	}));
-    }
-    if (users[rfid].access[group]) {
-	console.log("%s accessed %s at %s",
-		    users[rfid].name, location, Date.now());
-	return res.end(JSON.stringify({
-	    authorized: true
-	}));
-	//let them in
-	exec(config.openDoorScript,[config.relays[location], function (error, stdout, stderr) {
-	    console.log(stdout);
-	});
-
-    }
-    console.log("unauthorized attempt by %s to %s at %s",
-		users[rfid].name, location, Date.now())
-    return res.end(JSON.stringify({
-	authorized: false
-    }));
+// Main page just to check things are working
+app.get('/', function(req, res) {
+  return res.render('home');
 });
 
-//start listening!
-if(config.usetHTTPS) {
-    https.createServer(httpsOptions, app).listen(config.serverPort);
+app.get('/add', function(req, res) {
+  return res.render('add');
+});
+
+// Add a user to the list of users
+app.post('/add', function(req, res) {
+  if (!ADMIN_PASSWORD) {
+    logger.log('No admin password set, cannot add users');
+    return res.redirect('/');
+  }
+
+  if (req.body.pass !== ADMIN_PASSWORD) {
+    logger.log('Add attempted with incorrect admin password');
+    return res.redirect('/');
+  }
+
+  var user = Users.add(req.body);
+  if (user) logger.log('Added user ' + user.name);
+  return res.redirect('/');
+});
+
+// Access here!
+app.post('/:location/check', function(req, res) {
+  var code = req.body.rfid;
+  var location = req.params.location;
+  var user = Users.get(code);
+  if (!user) {
+    logger.log({code: code}, 'Access attempted at ' + location + ' with invalid code');
+    return res.status(403).send({authorized: false});
+  }
+
+  logger.log(user.name + ' opened ' + req.params.location);
+
+  // Let them in
+  exec(config.openDoorScript, config.relays[location], function(err, stdout, stderr) {});
+
+  return res.send({authorized: true});
+});
+
+// Display the logs from the service
+app.get('/logs', function(req, res) {
+  var admin = (req.query.pass === ADMIN_PASSWORD);
+
+  var logs = logger.get(50);
+
+  if (!admin) {
+    logs = logs.map(function(l) {
+      return {timestamp: l.timestamp, message: l.message};
+    });
+  }
+
+  res.send(logs);
+});
+
+
+/**
+ * Start listening
+ * =============================================================================
+ */
+if (config.useHTTPS) {
+  https.createServer(httpsOptions, app).listen(config.serverPort);
 } else {
-    http.createServer(app).listen(config.serverPort);
+  http.createServer(app).listen(config.serverPort);
 }
-console.log('RFID Server Listening');
+
+logger.log('Starting door server');

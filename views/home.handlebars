@@ -1,0 +1,32 @@
+<h2>Logs</h2>
+
+<input id="pass" type="password" />
+
+<div id="logs"></div>
+
+<script language="javascript" type="text/javascript">
+  $(document).ready(function() {
+    var logs = $('#logs');
+    var pass = $('#pass');
+
+    function updateLogs() {
+      var pw = pass.val();
+      var url = '/logs';
+      if (pw) url += '?pass=' + pw;
+      $.get(url, function( data ) {
+        logs.html('');
+        data.forEach(function(log) {
+          var logElems = '<p>' + new Date(log.timestamp);
+          logElems += ' - ' + log.message;
+          if (log.data) logElems += ' - ' + JSON.stringify(log.data);
+          logElems += '</p>';
+
+          logs.prepend(logElems);
+        });
+      });
+    }
+
+    updateLogs();
+    setInterval(updateLogs, 2500);
+  });
+</script>
