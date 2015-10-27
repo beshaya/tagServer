@@ -4,7 +4,7 @@ var spawn = require('child_process').spawn;
 var exec = require('child_process').exec;
 var fs = require('fs')
 
-var config = require('./client_config')
+var config = require('./config')
 
 //listen to a binary script for id's, then send them to the server
 //the server will respond authorized or not
@@ -61,6 +61,9 @@ function checkPermission(tagID) {
 	    }
 	});
     });
+    request.on('error', function(err) {
+	console.log(err);
+    });
 }
 
 function readCardData(chunk) {
@@ -74,17 +77,45 @@ function readCardData(chunk) {
     }
 }
 
+var child
+var keepReaderRunning = true;
+
 function spawnReaderProcess() {
-    var child = spawn(config.pollScript, config.pollOptions)
+    //kill any existing polling scripts
+    child = spawn(config.pollScript, config.pollOptions)
     child.stdout.on('data', readCardData);
     child.stderr.on('data', function (data) {
 	console.log('poll error: ' + data);
     });
+    /*
     child.on('close', function (code) {
-	console.log('child exited, restarting');
-	spawnReaderProcess();
+	//occurs on completion, which shouldn't really happen
+	respawnReader();
+    });*/
+
+    child.on('exit', function (code) {
+	//occurs on kill
+	respawnReader()
     });
+    
 };
+
+function respawnReader() {
+    if (!keepReaderRunning) process.exit();
+    console.log('child closed, restarting');
+    setTimeout(spawnReaderProcess, 1000);
+}
+
+function exitHandler() {
+    keepReaderRunning = false;
+    console.log("Shutting down client")
+    child.kill();
+}
+
+//process.on('exit', exitHandler);
+process.on('SIGINT', exitHandler);
+process.on('SIGTERM', exitHandler);
+process.on('uncaughtException', exitHandler);
     
 //listen to reader
 reader_data = "";
