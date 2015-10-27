@@ -16,7 +16,7 @@ var options = {
     hostname: config.serverIP,
     port: config.serverPort,
     path: '/'+mylocation+'/check',
-    method: 'GET',
+    method: 'POST',
 };
 
 if (config.useHTTPS) {
@@ -87,11 +87,6 @@ function spawnReaderProcess() {
     child.stderr.on('data', function (data) {
 	console.log('poll error: ' + data);
     });
-    /*
-    child.on('close', function (code) {
-	//occurs on completion, which shouldn't really happen
-	respawnReader();
-    });*/
 
     child.on('exit', function (code) {
 	//occurs on kill
@@ -115,7 +110,7 @@ function exitHandler() {
 //process.on('exit', exitHandler);
 process.on('SIGINT', exitHandler);
 process.on('SIGTERM', exitHandler);
-process.on('uncaughtException', exitHandler);
+//process.on('uncaughtException', errorHandler);
     
 //listen to reader
 reader_data = "";
