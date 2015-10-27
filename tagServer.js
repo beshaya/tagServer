@@ -36,7 +36,7 @@ if (config.useHTTPS) {
  */
 
 var app = express();
-
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.engine('handlebars', exphbs({defaultLayout: 'main'}));
 app.set('view engine', 'handlebars');
@@ -87,8 +87,10 @@ app.post('/:location/check', function(req, res) {
 
   //let them in
   exec(config.openDoorScript + ' ' + config.relays[location], function (error, stdout, stderr) {
-  console.log(stdout);
-});
+    if (stdout) {
+      console.log({timestamp: Date.now(), message: stdout});
+    }
+  });
   
   return res.send({authorized: true});
 });
