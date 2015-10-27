@@ -23,17 +23,10 @@ The executable bin/nfcpoll is compiled statically, so its only dependency should
 ## Authenticated Users
 
 Put a list of authenticated users in JSON format in users.json:
+
 ```
-users = { 
-  "RFID TAG": {"name": "USERNAME", "access": {
-    "group1": true,
-    "group2": true
-  },
-  "RFID TAG": {"name": "USERNAME", "access": {
-    "group1": true,
-    "group2": true
-  } 
-}
+{"name":"Carson","code":"11231223"}
+{"name":"Ben","code":"789"}
 ```
 
 RFID Tag is formatted %0x (i.e. deadbeef instead of DEADBEEF)
