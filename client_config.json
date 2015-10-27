@@ -8,7 +8,7 @@
     "serverIP": "10.0.31.43",
     "serverPort": "8080",
     "relays": {
-	"front": 18
+	"front": 24
     },
     
     "openDoor": "./bin/open"
