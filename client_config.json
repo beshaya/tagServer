@@ -4,12 +4,12 @@
     "noauthScript": "echo \"go away\"",
     "pollScript": "./bin/uidpoll",
     "pollOptions": ["-q"],
-    "useHTTPS": true,  
+    "useHTTPS": false,  
     "serverIP": "10.0.31.43",
     "serverPort": "8080",
     "relays": {
-	"front": 24
+	"front": 18
     },
     
-    "openDoor": "./bin/open"
+    "openDoorScript": "./bin/open"
 }

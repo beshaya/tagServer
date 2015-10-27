@@ -32,12 +32,11 @@ if (config.useHTTPS) {
 
 /**
  * App Setup & Middleware
- * =============================================================================
+ * 
  */
 
 var app = express();
 
-app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.engine('handlebars', exphbs({defaultLayout: 'main'}));
 app.set('view engine', 'handlebars');
@@ -86,9 +85,11 @@ app.post('/:location/check', function(req, res) {
 
   logger.log(user.name + ' opened ' + req.params.location);
 
-  // Let them in
-  exec(config.openDoorScript, config.relays[location], function(err, stdout, stderr) {});
-
+  //let them in
+  exec(config.openDoorScript + ' ' + config.relays[location], function (error, stdout, stderr) {
+  console.log(stdout);
+});
+  
   return res.send({authorized: true});
 });
 
