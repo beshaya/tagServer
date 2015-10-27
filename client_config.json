@@ -8,8 +8,8 @@
     "serverIP": "10.0.31.43",
     "serverPort": "8080",
     "relays": {
-	"front": 24
+	"front": 18
     },
     
-    "openDoor": "./bin/open"
+    "openDoorScript": "./bin/open"
 }

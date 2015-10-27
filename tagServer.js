@@ -55,14 +55,13 @@ app.get('/:location/check', function (req, res) {
     if (users[rfid].access[group]) {
 	console.log("%s accessed %s at %s",
 		    users[rfid].name, location, Date.now());
+	//let them in
+	exec(config.openDoorScript + ' ' + config.relays[location], function (error, stdout, stderr) {
+	    console.log(stdout);
+	});
 	return res.end(JSON.stringify({
 	    authorized: true
 	}));
-	//let them in
-	exec(config.openDoorScript,[config.relays[location], function (error, stdout, stderr) {
-	    console.log(stdout);
-	});
-
     }
     console.log("unauthorized attempt by %s to %s at %s",
 		users[rfid].name, location, Date.now())
