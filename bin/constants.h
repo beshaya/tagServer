@@ -1,0 +1,2 @@
+#define ALLOW_TIME 4000
+#define DENY_TIME 2000
