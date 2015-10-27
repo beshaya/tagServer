@@ -1,10 +1,10 @@
 {
     "location": "front",
     "authScript": "../bin/allow 4000",
-    "noauthScript": "echo \"go away\"",
+    "noauthScript": "../bin/deny 2000",
     "pollScript": "../bin/uidpoll",
     "pollOptions": ["-q"],
     "useHTTPS": false,  
-    "serverIP": "10.0.31.43",
+    "serverIP": "door.internal.mimobaby.com",
     "serverPort": "8080"   
 }
