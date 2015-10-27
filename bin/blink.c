@@ -110,6 +110,11 @@ static int GPIOWrite(int pin, int value) {
   return(0);
 }
 
+/**
+ * Turn a pin on and off
+ * @param pout the pin to toggle
+ * @param time how long to hold the pin in milliseconds
+ */
 int blinkLED(int pout, int time) {
 
   //export pin and set as output

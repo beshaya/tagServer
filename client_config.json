@@ -1,9 +1,15 @@
 {
-  "location": "front",
-  "authScript": "./bin/allow 4000",
-  "noauthScript": "echo \"go away\"",
-  "pollScript": "./bin/uidpoll",
-  "pollOptions": ["-q"],
-  "serverIP": "morganfox",
-  "serverPort": "8080"
+    "location": "front",
+    "authScript": "./bin/allow 4000",
+    "noauthScript": "echo \"go away\"",
+    "pollScript": "./bin/uidpoll",
+    "pollOptions": ["-q"],
+    "useHTTPS": false,  
+    "serverIP": "10.0.31.43",
+    "serverPort": "8080",
+    "relays": {
+	"front": 18
+    },
+    
+    "openDoor": "./bin/open"
 }
