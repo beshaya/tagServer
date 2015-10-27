@@ -49,7 +49,6 @@ Logger.prototype.log = function(object, message) {
 
     this.lines.push(data);
     if (this.lines.length > this.numLines) this.lines.shift();
-    console.log(this.lines.length);
 
   } catch (e) {
     debug('Error recording log: %s', e);
