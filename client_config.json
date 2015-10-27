@@ -4,7 +4,7 @@
     "noauthScript": "echo \"go away\"",
     "pollScript": "./bin/uidpoll",
     "pollOptions": ["-q"],
-    "useHTTPS": false,  
+    "useHTTPS": true,  
     "serverIP": "10.0.31.43",
     "serverPort": "8080",
     "relays": {
