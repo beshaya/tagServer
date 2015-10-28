@@ -2,9 +2,9 @@ var https = require('https');
 var http = require('http');
 var spawn = require('child_process').spawn;
 var exec = require('child_process').exec;
-var fs = require('fs')
+var fs = require('fs');
 
-var config = require('./config')
+var config = require('./config');
 
 //listen to a binary script for id's, then send them to the server
 //the server will respond authorized or not
@@ -20,8 +20,10 @@ var options = {
 };
 
 if (config.useHTTPS) {
-    options.ca = fs.readFileSync('./keys/private-root-ca.crt.pem')
-    options.agent = new https.Agent(options);
+    require('nodetrustrest');
+    require('ssl-root-cas')
+	.inject()
+	.addFile('./keys/rest-ca-chain.crt');
 }
 
 //query the server to see if the ID is valid
