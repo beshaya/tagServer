@@ -28,8 +28,12 @@ if (config.useHTTPS) {
 
 //query the server to see if the ID is valid
 function checkPermission(tagID) {
+    //verify that the response is a tag number
+    var idPattern = /[0-9a-fA-F]{14}/;
+    var match = tagID.match(idPattern);
+    if (!match) return;
     var body = JSON.stringify({
-	rfid: tagID
+	rfid: match[0]
     });
     
     options.headers = {
@@ -98,9 +102,9 @@ function spawnReaderProcess() {
 };
 
 function respawnReader() {
-    if (!keepReaderRunning) process.exit();
+    if (!keepReaderRunning) return process.exit();
     console.log('child closed, restarting');
-    setTimeout(spawnReaderProcess, 1000);
+    setTimeout(spawnReaderProcess, 5000);
 }
 
 function exitHandler() {
