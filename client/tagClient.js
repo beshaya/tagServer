@@ -5,6 +5,7 @@ var exec = require('child_process').exec;
 var fs = require('fs');
 
 var config = require('./config');
+var gpio = require('./gpio');
 
 //listen to a binary script for id's, then send them to the server
 //the server will respond authorized or not
@@ -32,6 +33,7 @@ function checkPermission(tagID) {
     var idPattern = /[0-9a-fA-F]{14}/;
     var match = tagID.match(idPattern);
     if (!match) return;
+    gpio.off(config.denyLED);
     var body = JSON.stringify({
 	rfid: match[0]
     });
@@ -57,13 +59,23 @@ function checkPermission(tagID) {
 	    chunk = JSON.parse(chunk);
 	    console.log(chunk);
 	    if (chunk.authorized) {
-		exec(config.authScript, function (error, stdout, stderr) {
-		    console.log(stdout);
-		});
+		gpio.blink(config.allowLED, 4000, function(){
+		    setTimeout(function(){
+			gpio.on(config.denyLED);
+		    }, 500);
+		})
 	    } else {
-		exec(config.noauthScript, function (error, stdout, stderr) {
-		    console.log(stdout);
-		});
+//		exec(config.noauthScript, function (error, stdout, stderr) {
+//		    console.log(stdout);
+		//		});
+		gpio.off(config.denyLED)
+		setTimeout(function(){
+		    gpio.blink(config.denyLED, 1000, function(){
+			setTimeout(function(){
+			    gpio.on(config.denyLED);
+			}, 2000);
+		    })
+		}, 500);
 	    }
 	});
     });
@@ -121,4 +133,5 @@ process.on('SIGTERM', exitHandler);
 //listen to reader
 reader_data = "";
 console.log("listening with ", config.pollScript);
+gpio.on(config.denyLED);
 spawnReaderProcess();

@@ -6,5 +6,7 @@
     "pollOptions": ["-q"],
     "useHTTPS": true,  
     "serverIP": "door.internal.mimobaby.com",
-    "serverPort": "8080"   
+    "serverPort": "8080",
+    "allowLED": 18,
+    "denyLED": 23
 }
