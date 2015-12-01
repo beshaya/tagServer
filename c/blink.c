@@ -119,6 +119,7 @@ int blinkLED(int pout, int time) {
 
   //export pin and set as output
   if (-1 == GPIOExport(pout)) {
+    printf("can't export");
     return (1);
   }
 
@@ -137,9 +138,9 @@ int blinkLED(int pout, int time) {
     return (3);
   }
 
-  if (-1 == GPIOUnexport(pout)) {
-    return (4);
-  }
+  //if (-1 == GPIOUnexport(pout)) {
+  //  return (4);
+  //}
   return (0);
 }
 

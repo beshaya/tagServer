@@ -96,7 +96,7 @@ function readCardData(chunk) {
 }
 
 var child
-var keepReaderRunning = true;
+var keepReaderRunning = false;
 
 function spawnReaderProcess() {
     //kill any existing polling scripts
