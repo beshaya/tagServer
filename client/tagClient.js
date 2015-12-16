@@ -5,7 +5,7 @@ var exec = require('child_process').exec;
 var fs = require('fs');
 
 var config = require('./config');
-var gpio = require('./gpio');
+var gpio = require('../lib/gpio');
 
 //listen to a binary script for id's, then send them to the server
 //the server will respond authorized or not

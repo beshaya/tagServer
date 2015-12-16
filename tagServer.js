@@ -5,6 +5,7 @@ var fs = require('fs');
 var https = require('https');
 var http = require('http');
 var exphbs  = require('express-handlebars');
+var gpio = require('./lib/gpio');
 
 var config = require('./client_config.json');
 
@@ -86,11 +87,7 @@ app.post('/:location/check', function(req, res) {
   logger.log(user.name + ' opened ' + req.params.location);
 
   //let them in
-  exec(config.openDoorScript + ' ' + config.relays[location], function (error, stdout, stderr) {
-    if (stdout) {
-      console.log({timestamp: Date.now(), message: stdout});
-    }
-  });
+  gpio.blink(config.relays[location], 4000, function () { });
   
   return res.send({authorized: true});
 });
