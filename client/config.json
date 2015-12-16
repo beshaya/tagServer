@@ -1,10 +1,12 @@
 {
     "location": "front",
-    "authScript": "../bin/allow 4000",
-    "noauthScript": "../bin/deny 2000",
-    "pollScript": "../bin/uidpoll",
+    "authScript": "./bin/allow 4000",
+    "noauthScript": "./bin/deny 2000",
+    "pollScript": "./bin/uidpoll",
     "pollOptions": ["-q"],
-    "useHTTPS": false,  
+    "useHTTPS": true,  
     "serverIP": "door.internal.mimobaby.com",
-    "serverPort": "8080"   
+    "serverPort": "8080",
+    "allowLED": 18,
+    "denyLED": 23
 }

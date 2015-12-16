@@ -2,9 +2,10 @@ var https = require('https');
 var http = require('http');
 var spawn = require('child_process').spawn;
 var exec = require('child_process').exec;
-var fs = require('fs')
+var fs = require('fs');
 
-var config = require('./config')
+var config = require('./config');
+var gpio = require('./gpio');
 
 //listen to a binary script for id's, then send them to the server
 //the server will respond authorized or not
@@ -20,14 +21,21 @@ var options = {
 };
 
 if (config.useHTTPS) {
-    options.ca = fs.readFileSync('./keys/private-root-ca.crt.pem')
-    options.agent = new https.Agent(options);
+    require('nodetrustrest');
+    require('ssl-root-cas')
+	.inject()
+	.addFile('./keys/rest-ca-chain.crt');
 }
 
 //query the server to see if the ID is valid
 function checkPermission(tagID) {
+    //verify that the response is a tag number
+    var idPattern = /[0-9a-fA-F]{14}/;
+    var match = tagID.match(idPattern);
+    if (!match) return;
+    gpio.off(config.denyLED);
     var body = JSON.stringify({
-	rfid: tagID
+	rfid: match[0]
     });
     
     options.headers = {
@@ -51,13 +59,23 @@ function checkPermission(tagID) {
 	    chunk = JSON.parse(chunk);
 	    console.log(chunk);
 	    if (chunk.authorized) {
-		exec(config.authScript, function (error, stdout, stderr) {
-		    console.log(stdout);
-		});
+		gpio.blink(config.allowLED, 4000, function(){
+		    setTimeout(function(){
+			gpio.on(config.denyLED);
+		    }, 500);
+		})
 	    } else {
-		exec(config.noauthScript, function (error, stdout, stderr) {
-		    console.log(stdout);
-		});
+//		exec(config.noauthScript, function (error, stdout, stderr) {
+//		    console.log(stdout);
+		//		});
+		gpio.off(config.denyLED)
+		setTimeout(function(){
+		    gpio.blink(config.denyLED, 1000, function(){
+			setTimeout(function(){
+			    gpio.on(config.denyLED);
+			}, 2000);
+		    })
+		}, 500);
 	    }
 	});
     });
@@ -78,7 +96,7 @@ function readCardData(chunk) {
 }
 
 var child
-var keepReaderRunning = true;
+var keepReaderRunning = false;
 
 function spawnReaderProcess() {
     //kill any existing polling scripts
@@ -96,9 +114,9 @@ function spawnReaderProcess() {
 };
 
 function respawnReader() {
-    if (!keepReaderRunning) process.exit();
+    if (!keepReaderRunning) return process.exit();
     console.log('child closed, restarting');
-    setTimeout(spawnReaderProcess, 1000);
+    setTimeout(spawnReaderProcess, 5000);
 }
 
 function exitHandler() {
@@ -115,4 +133,5 @@ process.on('SIGTERM', exitHandler);
 //listen to reader
 reader_data = "";
 console.log("listening with ", config.pollScript);
+gpio.on(config.denyLED);
 spawnReaderProcess();
